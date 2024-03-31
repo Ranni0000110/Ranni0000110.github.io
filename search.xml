@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>关于一些常用的命令</title>
+      <link href="/2024/03/31/2024-3-31-%E5%85%B3%E4%BA%8E%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/"/>
+      <url>/2024/03/31/2024-3-31-%E5%85%B3%E4%BA%8E%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Redis篇"><a href="#Redis篇" class="headerlink" title="Redis篇"></a>Redis篇</h2><p>关于Redis的启动，首先我们应该<strong>进入redis的安装目录下，在地址栏输入cmd并回车</strong><br>然后我们会进入到redis界面，直接输入<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server.exe redis.windows.conf</span><br></pre></td></tr></table></figure><br>如果结果像下图一样，则证明redis启动成功<br><img src="https://img2.imgtp.com/2024/03/31/j93P1rCP.png" alt="redis"><br>如果报错请依次输入下面的指令后，再输入上述命令。<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cl.exe</span><br><span class="line">shutdown</span><br><span class="line"><span class="keyword">exit</span></span><br></pre></td></tr></table></figure></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/2024/03/29/%E6%B5%8B%E8%AF%95/"/>
       <url>/2024/03/29/%E6%B5%8B%E8%AF%95/</url>
