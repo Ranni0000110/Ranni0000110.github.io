@@ -4,9 +4,48 @@
   
     
     <entry>
+      <title>关于HashMap的基本原理</title>
+      <link href="/2024/07/15/2024-7-15-%E5%85%B3%E4%BA%8EHashMap%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/"/>
+      <url>/2024/07/15/2024-7-15-%E5%85%B3%E4%BA%8EHashMap%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[<h2 id="简述HashMap的基本原理"><a href="#简述HashMap的基本原理" class="headerlink" title="简述HashMap的基本原理"></a>简述HashMap的基本原理</h2><p>HashMap是基于哈希表实现的，由数组+链表\红黑树组成。在添加数据时先计算key的哈希值，若key的哈希值和某个值的哈希值相同，则比对key和值的区别，若相同则进行替换，若不同则存入链表或红黑树中。具体在下面的put方法实现中。<br>在JDK1.7版本中，HashMap仅采用数组加链表的形式进行存储，后来在JDK1.8中引入了红黑树，在链表长度&gt;8且数组长度&gt;64时，链表会自动转换为红黑树进行存储，反之则会从红黑树退化回链表</p><h2 id="简述HashMap的put过程"><a href="#简述HashMap的put过程" class="headerlink" title="简述HashMap的put过程"></a>简述HashMap的put过程</h2><p>Hash在添加数据时首先会进行判断，判断数组是否为空，若为空则初始化一个长度为16的数组并进行添加。若不为空则根据key的哈希值进行索引，若哈希值为空则直接添加，并判断size+1是否大于临界值，若大于临界值则需要进行扩容。若key的哈希值不为空则有两种情况，一种是有两个一模一样的key插入进来，还有一种就是虽然哈希值相同但是key不相同，因为哈希值是有限的。这时候就要判断key是否相同。若相同则直接进行替换，以最后的key为主。若不相同则要把kv存入数组下的链表或红黑树中。这时候我们要先进行判断数组下面连着的是不是红黑树。如果是红黑树则直接在红黑树中进行添加。如果不是红黑树我们则要先遍历链表，检验key是否已经在链表中存在，若存在则进行覆盖，若不存在则在链表的末尾添加该kv。添加后我们还需要对链表的长度进行判断，若链表的长度大于8且数组的长度大于64，则链表需要转换为红黑树。</p><h2 id="简述HashMap的扩容过程"><a href="#简述HashMap的扩容过程" class="headerlink" title="简述HashMap的扩容过程"></a>简述HashMap的扩容过程</h2><p>首先我们要判断HashMap的旧容量（oldCap）是否大于0.若不大于0则证明此HashMap是刚刚创建的，需要对其进行初始化，我们设置容量为16的数组，设置扩容阈值为16*0.75=12，当容量大于12时会进行自动扩容。若旧容量大于0则证明已经初始化完成。那么我们就新建一个容量为原数组2倍的新数组，并将原数组的数据复制到新数组中。若数组中的next为空，则证明数组下面没有链表或红黑树，可以直接添加到新数组。若不为空我们就要判断下面的数据结构是否为红黑树。若是红黑树我们直接红黑树添加。若不是我们则先要遍历链表，并判断原标的哈希值和新表的哈希值是否相同。若相同则把该数组下面的所有值放置原位，若不相同则把需要移动的数组的所有值安置在原始位置+增加的数组大小的位置上。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于ArrayList和LinkedList以及其他单列集合</title>
+      <link href="/2024/07/13/2024-7-13-%E5%85%B3%E4%BA%8EArrayList%E5%92%8CLinkedList%E4%BB%A5%E5%8F%8A%E5%85%B6%E4%BB%96%E5%8D%95%E5%88%97%E9%9B%86%E5%90%88%20copy/"/>
+      <url>/2024/07/13/2024-7-13-%E5%85%B3%E4%BA%8EArrayList%E5%92%8CLinkedList%E4%BB%A5%E5%8F%8A%E5%85%B6%E4%BB%96%E5%8D%95%E5%88%97%E9%9B%86%E5%90%88%20copy/</url>
+      
+        <content type="html"><![CDATA[<h2 id="集合"><a href="#集合" class="headerlink" title="集合"></a>集合</h2><p>单列：（基于Collectrion）<br>    List(<strong>ArrayList</strong>,<strong>LinkedList</strong>,Vector)<br>    Set(HashSet,TreeSet)<br>双列：(基于Map)<br>Map(<strong>HashMap</strong>,<strong>ConcurrentHashMap</strong>,HashTable,TreeMap)</p><h2 id="ArrayList基本概述与扩容机制"><a href="#ArrayList基本概述与扩容机制" class="headerlink" title="ArrayList基本概述与扩容机制"></a>ArrayList基本概述与扩容机制</h2><p>ArrayList是由动态数组实现的，初始容量为0，在第一次添加数据时会出发ArrayList扩容机制扩容到10。当添加的数量超过了ArrayList的容量时，ArrayList会自动扩容为原来的1.5倍。关于ArrayList的扩容机制，ArrayList会调用ensureCapacityInternal方法先判断容量是否足够，如果不够就创建一个原来长度1.5倍的新数组，然后把原数组复制到新数组中，并且添加要添加的元素。</p><h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>ArrayList是基于动态数组实现的，而LinkedList是基于双向链表实现的。在查找数据时，ArrayList可以使用下标进行查询，时间复杂度是O(1),而LinkedList需要遍历链表，时间复杂度是O(n)。但是他们两个都不是线程安全的。如需保证线程安全，可以在方法内使用，或使用synchronized关键字对两个集合进行修饰。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>简单描述一下JVM中的垃圾回收</title>
+      <link href="/2024/07/06/2024-7-6-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%20copy/"/>
+      <url>/2024/07/06/2024-7-6-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%20copy/</url>
+      
+        <content type="html"><![CDATA[<h2 id="判断对象什么时候回收"><a href="#判断对象什么时候回收" class="headerlink" title="判断对象什么时候回收"></a>判断对象什么时候回收</h2><p>一般有两种方法，分别是引用计数法和可达性分析法。<br><strong>引用计数法</strong> 一个对象被引用一次，就在当前对象上递增一次引用次数，如果对象引用次数为0则可回收。但是如果两个对象循环引用，会导致该方法失效。<br><strong>可达性分析法</strong> 基于“GC Roots”的对象图，从GC Roots开始向下搜索，搜索所走过的路径称为“引用链”，当一个对象到GC Roots没有任何引用链相连时，则该对象可回收。现在的虚拟机都是采用该方法进行对象回收的判断。</p><h2 id="GC算法"><a href="#GC算法" class="headerlink" title="GC算法"></a>GC算法</h2><p>一般有三种方法，分别是引用计数法和可达性分析法。<br><strong>标记清除算法</strong> 在内存中将需要存活的对象做出标记，那么没被标记的对象就是可以回收的对象。效率较高，但是会留下大量的内存碎片不能好好利用。<br><strong>标记整理算法</strong> 为了利用清楚算法残留的内存碎片，将存活对象移动到内存的一端，然后清理掉端边界以外的内存。这样留下了大块的内存，但是需要移动对象，效率较低。<br><strong>标记复制算法</strong> 将内存分成两等块，每次只使用其中一块，当一块内存用完后，将存活对象复制到另一块内存中，然后将第一块内存清空。可以有哦小利用内存，但是每次只使用内存的一半，对内存的使用率低。</p><h2 id="分代回收"><a href="#分代回收" class="headerlink" title="分代回收"></a>分代回收</h2><p>java1.8版本后的堆中有新生代和老年代，内存占用比例大概是1:2。在新生代的内存中有分为三个区域，eden区和两个幸存者区，内存比例大概是8:1:1.<br>在新生代中，新创建的对象会分配到eden区，当eden区内存不足的时候，会使用可达性分析法判断存活对象，并把该对象放入其中一个幸存者区中。当eden区又接收了很多新对象内存不足时，会使用可行性分析法判断存活对象，并把edne的存活对象和第一个幸存区的存活对象一起放到第二个幸存者区中。当处于幸存者区的对象经历最多15次回收后还存活，会把该对象存入老年代。<br><strong>MinorGC</strong> 一般发生在新生代的垃圾回收，stop the world（会暂停所有线程，进行标记整理算法）的时间会很快，效率高<br><strong>MixedGC</strong> 一般发生在新生代和老年代部分区域的垃圾回收，以G1收集器。<br><strong>FullGC</strong>  一般是新生代和老年代的完整垃圾回收，stw时间很长。</p><h2 id="垃圾回收器盘点"><a href="#垃圾回收器盘点" class="headerlink" title="垃圾回收器盘点"></a>垃圾回收器盘点</h2><p><strong>串行垃圾回收器</strong> 一般由 <strong>Serial</strong> 、<strong>Serial Old</strong> 组成，<strong>Serial</strong>作用于新生代，采用复制算法，<strong>Serial Old</strong>作用于老年代，采用标记整理算法。在垃圾回收时只有一个线程可以工作，其他线程都需stw。<br><strong>并行垃圾回收器</strong> 一般由 <strong>Parallel New</strong> 、<strong>Parallel Old</strong> 组成，<strong>Parallel New</strong>作用于新生代，采用复制算法，<strong>Parallel Old</strong>作用于老年代，采用标记整理算法。在垃圾回收时多个线程可以进行回收工作，其他线程都需stw。<br><strong>并发垃圾回收器（CMS）</strong> 使用标记清除算法，并发对老年代垃圾进行回收。首先回收的线程会进行初始标记，这时其他线程会进入stw状态，之后进入并发标记，并发标记时剩下线程可以正常运行。并发标记过后所有线程都需进行重新标记，最后回收线程进行清理，其他线程正常运行。<br><strong>G1垃圾回收器</strong> 应用于新生代和老年代，在JDK9后默认使用G1.划分了多个区域，分为eden,survivor,old,humongous四个区域，其中humongous专为大对象准备。采用复制算法，分为新生代回收，并发标记，混合收集三个阶段。如并发失败会出发Full GC.</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>简单描述一下JVM中的类加载器和类加载机制</title>
-      <link href="/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/"/>
-      <url>/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/</url>
+      <link href="/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%20copy/"/>
+      <url>/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%20copy/</url>
       
         <content type="html"><![CDATA[<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>首先，因为JVM只能运行二进制文件，为了能让JVM看懂文件都写了什么，我们要使用类加载器把字节码文件，也就是.class文件加载到JVM中。<br>类加载器主要由BootStrap（启动类加载器）、Extension（扩展类加载器）、AppClassLoader（应用类加载器）三个部分组成。<br>JVM在类需要加载的时候会直接委派给父类加载器也就是启动类加载器，如果加载不了再往下传，直到应用类加载器。这么做保证了两个好处。<br>一是通过双亲委派机制可以避免类被重复加载，确保唯一性和效率，二是保证类库的api不会被修改，确保安全性。</p><h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p>类从被加载到JVM到卸出内存一共分为七个阶段<br>首先是类的加载阶段，JVM通过类加载器加载类，把.class文件加载到内存中。<br>其次是连接阶段，JVM通过验证，准备，解析三个步骤来链接类，验证是为了确保类文件能够被JVM正确执行，准备是为类分配内存，一般是分配默认值，解析是把符号引用转换成直接引用。<br>然后是类的初始化阶段，一般这个阶段会把类赋予我们期望的值。<br>最后是类的使用和销毁阶段，在使用类时我们会调用类的方法，当类不再被使用时，JVM会回收内存。</p>]]></content>
       
