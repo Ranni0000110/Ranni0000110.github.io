@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>关于编译器的一些小技巧</title>
+      <link href="/2024/09/05/2024-9-5-%E5%85%B3%E4%BA%8E%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/"/>
+      <url>/2024/09/05/2024-9-5-%E5%85%B3%E4%BA%8E%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/</url>
+      
+        <content type="html"><![CDATA[<h2 id="IDEA"><a href="#IDEA" class="headerlink" title="IDEA"></a>IDEA</h2><h3 id="快速通过请求定位代码"><a href="#快速通过请求定位代码" class="headerlink" title="快速通过请求定位代码"></a>快速通过请求定位代码</h3><p>在idea中双击shift,可以调出搜索框，这时输入你想查找的URL就可以直接定位到相应的方法。<br><img src="https://ranni.s3.bitiful.net/idea1.png" alt="idea小妙招1.1" title="idea小妙招1.1"><br><img src="https://ranni.s3.bitiful.net/idea2.png" alt="idea小妙招1.2" title="idea小妙招1.2"></p><h3 id="格式化代码"><a href="#格式化代码" class="headerlink" title="格式化代码"></a>格式化代码</h3><p><strong>ctrl+alt+l</strong></p><h2 id="VSCODE"><a href="#VSCODE" class="headerlink" title="VSCODE"></a>VSCODE</h2><h3 id="格式化代码-1"><a href="#格式化代码-1" class="headerlink" title="格式化代码"></a>格式化代码</h3><p><strong>shift+alt+f</strong></p><h2 id="git-bash"><a href="#git-bash" class="headerlink" title="git bash"></a>git bash</h2><h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p><strong>ctrl + insert</strong></p><h3 id="粘贴"><a href="#粘贴" class="headerlink" title="粘贴"></a>粘贴</h3><p><strong>shift + insert</strong></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>关于sql的一些学习</title>
       <link href="/2024/09/05/2024-9-5-%E5%85%B3%E4%BA%8Esql%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AD%A6%E4%B9%A0/"/>
       <url>/2024/09/05/2024-9-5-%E5%85%B3%E4%BA%8Esql%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AD%A6%E4%B9%A0/</url>
