@@ -18,6 +18,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 踩坑及解决办法 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -36,6 +42,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Docker </tag>
+            
+            <tag> 部署 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -56,6 +70,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -74,6 +94,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
       
     </entry>
     
@@ -94,6 +120,16 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 部署 </tag>
+            
+            <tag> 踩坑及解决办法 </tag>
+            
+            <tag> Redis </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -112,6 +148,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
       
     </entry>
     
@@ -132,6 +174,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> -小技巧 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -150,6 +198,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> MySQL </tag>
+            
+            <tag> 小技巧 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -170,6 +226,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 常用命令 </tag>
+            
+            <tag> Git </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -188,6 +252,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
       
     </entry>
     
@@ -208,6 +278,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 多线程 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -226,6 +304,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 多线程 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -246,6 +332,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 多线程 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -264,6 +358,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Mybatis </tag>
+            
+        </tags>
       
     </entry>
     
@@ -284,6 +384,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Spring </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -302,6 +408,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 集合 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -322,6 +436,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 集合 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -340,6 +462,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> JVM </tag>
+            
+        </tags>
       
     </entry>
     
@@ -360,6 +490,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> JVM </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -378,6 +516,14 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> JVM </tag>
+            
+        </tags>
       
     </entry>
     
@@ -398,6 +544,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> MySQL </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -416,6 +568,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> MySQL </tag>
+            
+        </tags>
       
     </entry>
     
@@ -436,6 +594,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Spring </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -454,6 +620,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Spring </tag>
+            
+        </tags>
       
     </entry>
     
@@ -474,6 +646,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Java </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -493,6 +671,14 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> Spring </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -511,6 +697,20 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+            <tag> Cpolar </tag>
+            
+            <tag> Hexo </tag>
+            
+            <tag> Vue </tag>
+            
+            <tag> 常用命令 </tag>
+            
+        </tags>
       
     </entry>
     
