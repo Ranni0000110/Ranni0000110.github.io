@@ -5,6 +5,58 @@
     
     <entry>
       <title>长时间不登录宝塔导致其页面404解决方案</title>
+      <link href="/2024/10/14/2024-10-14-%E4%BD%BF%E7%94%A8Docker%E5%88%B6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84%E9%95%9C%E5%83%8F/"/>
+      <url>/2024/10/14/2024-10-14-%E4%BD%BF%E7%94%A8Docker%E5%88%B6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84%E9%95%9C%E5%83%8F/</url>
+      
+        <content type="html"><![CDATA[<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ul><li>将你已经封装好的jar包导入Linux中</li><li>在Linux中创建Dockerfile文件，并写入以下内容（括号内容应删去）：<div class="tip success"><p>正常情况下</p></div><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FROM openjdk:17（你想要的任意版本）</span><br><span class="line"></span><br><span class="line">LABEL author=ranni(名字)</span><br><span class="line"></span><br><span class="line">COPY app.jar /app.jar（把jar包存放在规定的文件夹）</span><br><span class="line"></span><br><span class="line">EXPOSE 8080（端口）</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;/app.jar&quot;]（启动命令）</span><br></pre></td></tr></table></figure></li><li>输入以下命令<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -f Dockerfile -t 你的镜像名:版本号 .</span><br></pre></td></tr></table></figure>这时你查看镜像应该已经发现你创建的镜像了，接着启动它<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8080:8080 你的镜像名:版本号</span><br></pre></td></tr></table></figure>就可以直接web访问了。<div class="tip warning faa-horizontal animated"><p>但是我遇到了问题，在设置完镜像后不能正常启动，原因是我使用的国内镜像不能正常拉取所需要的镜像</p></div>如果很不幸，你和我处境一样，我知道有两种办法来解决。<br>其一是切换镜像，但是我不推荐，因为麻烦。<br>最后就是我选择的方法，自己导入所需镜像，然后把Dockerfile中需要的镜像地址替换成我导入的镜像地址。<br>在这个步骤中我需要自己导入jdk17.<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/openjdk:17</span><br></pre></td></tr></table></figure>同时修改Dockerfile文件<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ARG BASE_IMAGE</span><br><span class="line"></span><br><span class="line">FROM $BASE_IMAGE</span><br><span class="line"></span><br><span class="line">LABEL author=ranni(名字)</span><br><span class="line"></span><br><span class="line">COPY app.jar /app.jar（把jar包存放在规定的文件夹）</span><br><span class="line"></span><br><span class="line">EXPOSE 8080（端口）</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;/app.jar&quot;]（启动命令）</span><br></pre></td></tr></table></figure>然后在启动容器时，指定参数<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8080:8080 -e BASE_IMAGE=swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/openjdk:17 你的镜像名:版本号</span><br></pre></td></tr></table></figure>这样就可以正常拉取镜像并启动容器了。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 一些实践 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> docker </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>使用docker实现Redis主从集群</title>
+      <link href="/2024/10/12/2024-10-12-%E4%BD%BF%E7%94%A8docker%E5%AE%9E%E7%8E%B0Redis%E4%B8%BB%E4%BB%8E/"/>
+      <url>/2024/10/12/2024-10-12-%E4%BD%BF%E7%94%A8docker%E5%AE%9E%E7%8E%B0Redis%E4%B8%BB%E4%BB%8E/</url>
+      
+        <content type="html"><![CDATA[<h1 id="长时间不登录宝塔导致其页面404解决方案"><a href="#长时间不登录宝塔导致其页面404解决方案" class="headerlink" title="长时间不登录宝塔导致其页面404解决方案"></a>长时间不登录宝塔导致其页面404解决方案</h1><p>在我把项目部署在宝塔面板之后，我仿佛卸下了包袱一样，这一定程度上意味着我不用再去修改这个项目了，偶尔上线看一眼，在心里和自己说“我曾经还能写出来这个玩意”。<br>由于服务器是一直开着的，我也很少去关心项目的运行情况，毕竟能跑的项目就是好项目。但是线上的项目有时会很玄学的出现bug,例如我的论坛中的文章不能发布了，而在本地条件下还是可以正常运行的。尴尬的是当我想登录到宝塔后台进行文件替换的时候，我保存的宝塔页面变成了404。<br>这个问题不止出现了一次，每一次出现我都要打开好几个网页来查找解决方案。所以，我决定写一篇文章来记录一下解决这个问题的过程。</p><h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我购买的服务器是华为云，所以我登录到华为云上，使用华为云的远程登录进入服务器。<br>在服务器中输入<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bt 14</span><br></pre></td></tr></table></figure><br>会出现以下信息<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">===============================================</span><br><span class="line">正在执行(14)...</span><br><span class="line">===============================================</span><br><span class="line">==================================================================</span><br><span class="line">BT-Panel default info!</span><br><span class="line">==================================================================</span><br><span class="line">外网面板地址: https://***.***.***.***:****/login</span><br><span class="line">内网面板地址: https://***.***.***.***:****/login</span><br><span class="line">username: ********</span><br><span class="line">password: ********</span><br><span class="line">Warning:</span><br><span class="line">If you cannot access the panel, </span><br><span class="line">release the following port (8888|888|80|443|20|21) in the security group</span><br><span class="line">注意：初始密码仅在首次登录面板前能正确获取，其它时间请通过 bt 5 命令修改密码 </span><br><span class="line">==================================================================</span><br></pre></td></tr></table></figure><br><strong>直接访问外网面板地址即可访问宝塔后台</strong></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 一些实践 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Docker </tag>
+            
+            <tag> Redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>长时间不登录宝塔导致其页面404解决方案</title>
       <link href="/2024/10/12/2024-10-12-%E9%95%BF%E6%97%B6%E9%97%B4%E4%B8%8D%E7%99%BB%E5%BD%95%E5%AE%9D%E5%A1%94/"/>
       <url>/2024/10/12/2024-10-12-%E9%95%BF%E6%97%B6%E9%97%B4%E4%B8%8D%E7%99%BB%E5%BD%95%E5%AE%9D%E5%A1%94/</url>
       
@@ -38,7 +90,7 @@
       
       <categories>
           
-          <category> 小妙招以及踩过的坑 </category>
+          <category> 一些实践 </category>
           
       </categories>
       
@@ -48,6 +100,8 @@
             <tag> Docker </tag>
             
             <tag> 部署 </tag>
+            
+            <tag> 常用命令 </tag>
             
         </tags>
       
@@ -115,7 +169,7 @@
       
       <categories>
           
-          <category> 小妙招以及踩过的坑 </category>
+          <category> 一些实践 </category>
           
       </categories>
       
@@ -124,9 +178,9 @@
             
             <tag> 部署 </tag>
             
-            <tag> 踩坑及解决办法 </tag>
-            
             <tag> Redis </tag>
+            
+            <tag> 踩坑及解决办法 </tag>
             
         </tags>
       
@@ -596,9 +650,9 @@
       
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> Java </tag>
+            
+            <tag> Spring </tag>
             
         </tags>
       
@@ -673,9 +727,9 @@
       
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> Java </tag>
+            
+            <tag> Spring </tag>
             
         </tags>
       
@@ -700,6 +754,8 @@
       
         <tags>
             
+            <tag> 常用命令 </tag>
+            
             <tag> Redis </tag>
             
             <tag> Cpolar </tag>
@@ -707,8 +763,6 @@
             <tag> Hexo </tag>
             
             <tag> Vue </tag>
-            
-            <tag> 常用命令 </tag>
             
         </tags>
       
