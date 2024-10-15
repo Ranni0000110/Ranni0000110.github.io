@@ -33,7 +33,7 @@
       <link href="/2024/10/12/2024-10-12-%E4%BD%BF%E7%94%A8docker%E5%AE%9E%E7%8E%B0Redis%E4%B8%BB%E4%BB%8E/"/>
       <url>/2024/10/12/2024-10-12-%E4%BD%BF%E7%94%A8docker%E5%AE%9E%E7%8E%B0Redis%E4%B8%BB%E4%BB%8E/</url>
       
-        <content type="html"><![CDATA[<h1 id="长时间不登录宝塔导致其页面404解决方案"><a href="#长时间不登录宝塔导致其页面404解决方案" class="headerlink" title="长时间不登录宝塔导致其页面404解决方案"></a>长时间不登录宝塔导致其页面404解决方案</h1><p>在我把项目部署在宝塔面板之后，我仿佛卸下了包袱一样，这一定程度上意味着我不用再去修改这个项目了，偶尔上线看一眼，在心里和自己说“我曾经还能写出来这个玩意”。<br>由于服务器是一直开着的，我也很少去关心项目的运行情况，毕竟能跑的项目就是好项目。但是线上的项目有时会很玄学的出现bug,例如我的论坛中的文章不能发布了，而在本地条件下还是可以正常运行的。尴尬的是当我想登录到宝塔后台进行文件替换的时候，我保存的宝塔页面变成了404。<br>这个问题不止出现了一次，每一次出现我都要打开好几个网页来查找解决方案。所以，我决定写一篇文章来记录一下解决这个问题的过程。</p><h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我购买的服务器是华为云，所以我登录到华为云上，使用华为云的远程登录进入服务器。<br>在服务器中输入<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bt 14</span><br></pre></td></tr></table></figure><br>会出现以下信息<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">===============================================</span><br><span class="line">正在执行(14)...</span><br><span class="line">===============================================</span><br><span class="line">==================================================================</span><br><span class="line">BT-Panel default info!</span><br><span class="line">==================================================================</span><br><span class="line">外网面板地址: https://***.***.***.***:****/login</span><br><span class="line">内网面板地址: https://***.***.***.***:****/login</span><br><span class="line">username: ********</span><br><span class="line">password: ********</span><br><span class="line">Warning:</span><br><span class="line">If you cannot access the panel, </span><br><span class="line">release the following port (8888|888|80|443|20|21) in the security group</span><br><span class="line">注意：初始密码仅在首次登录面板前能正确获取，其它时间请通过 bt 5 命令修改密码 </span><br><span class="line">==================================================================</span><br></pre></td></tr></table></figure><br><strong>直接访问外网面板地址即可访问宝塔后台</strong></p>]]></content>
+        <content type="html"><![CDATA[<h1 id="使用docker实现Redis主从集群"><a href="#使用docker实现Redis主从集群" class="headerlink" title="使用docker实现Redis主从集群"></a>使用docker实现Redis主从集群</h1><h2 id="配置主Redis"><a href="#配置主Redis" class="headerlink" title="配置主Redis"></a>配置主Redis</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 6379:6379 \</span><br><span class="line">&gt; -v /app/rd1:/bitnami/redis/data \</span><br><span class="line">&gt; -e REDIS_REPLICATION_MODE=master \</span><br><span class="line">&gt; -e REDIS_PASSWORD=123456 \</span><br><span class="line">&gt; --network mynet --name redis01 \</span><br><span class="line">&gt; bitnami/redis</span><br></pre></td></tr></table></figure><p>但是执行完上述代码后我们发现，redis的容器并未成功运行，排查日志发现是因为/app/rd1目录的权限只有root用户可读写，而redis的启动用户是redis，所以无法写入数据。<br>解决方法：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod -R 777 rd1 (更改权限)</span><br><span class="line">docker restart redis01 (重启容器)</span><br></pre></td></tr></table></figure></p><h2 id="配置从Redis"><a href="#配置从Redis" class="headerlink" title="配置从Redis"></a>配置从Redis</h2><p>由于从Redis也有权限问题，所以我们直接创建并修改文件权限<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir rd2</span><br><span class="line">chmod -R 777 rd2</span><br></pre></td></tr></table></figure><br>创建并启动从Redis容器<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 6380:6379 \</span><br><span class="line">&gt; -v /app/rd2:/bitnami/redis/data \</span><br><span class="line">&gt; -e REDIS_REPLICATION_MODE=slave \</span><br><span class="line">&gt; -e REDIS_MASTER_HOST=redis01 \</span><br><span class="line">&gt; -e REDIS_MASTER_PORT_NUMBER=6379 \</span><br><span class="line">&gt; -e REDIS_MASTER_PASSWORD=123456 \</span><br><span class="line">&gt; --network mynet --name redis02 \</span><br><span class="line">&gt; bitnami/redis</span><br></pre></td></tr></table></figure><br><div class="tip success"><p>正常情况下主从Redis就已经设置完毕了，你可以通过redis可视化工具链接并查看主从数据是否同步。</p></div></p>]]></content>
       
       
       <categories>
@@ -176,11 +176,11 @@
       
         <tags>
             
-            <tag> 部署 </tag>
-            
             <tag> Redis </tag>
             
             <tag> 踩坑及解决办法 </tag>
+            
+            <tag> 部署 </tag>
             
         </tags>
       
@@ -754,9 +754,9 @@
       
         <tags>
             
-            <tag> 常用命令 </tag>
-            
             <tag> Redis </tag>
+            
+            <tag> 常用命令 </tag>
             
             <tag> Cpolar </tag>
             
