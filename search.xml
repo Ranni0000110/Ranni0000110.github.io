@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>关于Redis的键值设计和一些问题</title>
+      <link href="/2024/10/16/2024-10-16-%E5%85%B3%E4%BA%8ERedis%E7%9A%84%E9%94%AE%E5%80%BC%E8%AE%BE%E8%AE%A1/"/>
+      <url>/2024/10/16/2024-10-16-%E5%85%B3%E4%BA%8ERedis%E7%9A%84%E9%94%AE%E5%80%BC%E8%AE%BE%E8%AE%A1/</url>
+      
+        <content type="html"><![CDATA[<h1 id="键值设计约定"><a href="#键值设计约定" class="headerlink" title="键值设计约定"></a>键值设计约定</h1><ul><li>基本格式：[业务名称]:[数据名]:[id] 例如：login:user:123456</li><li>长度不超过44字节</li><li>不包含特殊字符<h1 id="Bigkey问题"><a href="#Bigkey问题" class="headerlink" title="Bigkey问题"></a>Bigkey问题</h1>对于单个key来说，value &gt; 10kb则看作是Bigkey;对于集合key来说，元素数量 &gt; 1000则看作是Bigkey。<h2 id="危害"><a href="#危害" class="headerlink" title="危害"></a>危害</h2><div class="tip warning"><p>网络阻塞</p></div>对Bigkey执行读请求时，少量的QPS就可能导致带宽使用率被占满，导致Redis实例乃至物理机变慢<div class="tip warning"><p>数据倾斜</p></div>Bigkey所在的Redis实例内存使用率远超其他实例，无法使数据分片的内存资源达到均衡<div class="tip warning"><p>Redis阻塞</p></div>对元素较多的hash、list、zset等数据结构执行操作时耗时较久，可能导致主进程阻塞<div class="tip warning"><p>CPU压力</p></div>对Bigkey的数据序列化和反序列化会导致CPU使用率飙升，影响redis实例和本机其他应用<h2 id="发现Bigkey"><a href="#发现Bigkey" class="headerlink" title="发现Bigkey"></a>发现Bigkey</h2></li><li>redis-cli —bigkeys命令：查看Redis实例中Bigkey</li><li>scan扫描<br>利用scan扫描Redis中所有Key,利用strlen、hlen等命令判断key的长度（不建议使用 MEMORY USAGE）</li><li>第三方工具，如Redis-Rdb-Tools分析RDB快照</li><li>网络监控，监控进出Redis的网络数据，超出预警主动警告<h2 id="Bigkey的删除"><a href="#Bigkey的删除" class="headerlink" title="Bigkey的删除"></a>Bigkey的删除</h2></li><li>redis3.0及以下版本<br>遍历Bigkey元素，先逐个删除，最后删除Bigkey本身</li><li>redis4.0以后<br>unlink命令<h1 id="慢查询问题"><a href="#慢查询问题" class="headerlink" title="慢查询问题"></a>慢查询问题</h1>若redis中存储的数据量过大，且不合理的使用了某些命令（比如keys *），会导致redis执行速度很慢。由于redis是单线程的，所以慢查询会导致其他命令的执行速度受到影响。<h2 id="慢查询处理"><a href="#慢查询处理" class="headerlink" title="慢查询处理"></a>慢查询处理</h2><h3 id="发现慢查询"><a href="#发现慢查询" class="headerlink" title="发现慢查询"></a>发现慢查询</h3>slowlog get [n] 命令，获取最新的n条慢查询命令</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Redis </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>使用Docker制作自己的镜像</title>
       <link href="/2024/10/14/2024-10-14-%E4%BD%BF%E7%94%A8Docker%E5%88%B6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84%E9%95%9C%E5%83%8F/"/>
       <url>/2024/10/14/2024-10-14-%E4%BD%BF%E7%94%A8Docker%E5%88%B6%E4%BD%9C%E8%87%AA%E5%B7%B1%E7%9A%84%E9%95%9C%E5%83%8F/</url>
@@ -85,7 +110,7 @@
       <link href="/2024/10/10/2024-10-10-Docker%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/"/>
       <url>/2024/10/10/2024-10-10-Docker%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</url>
       
-        <content type="html"><![CDATA[<h1 id="CentOS-安装Docker"><a href="#CentOS-安装Docker" class="headerlink" title="CentOS 安装Docker"></a>CentOS 安装Docker</h1><h2 id="卸载旧版本"><a href="#卸载旧版本" class="headerlink" title="卸载旧版本"></a>卸载旧版本</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo yum remove docker \</span><br><span class="line">                  docker-client \</span><br><span class="line">                  docker-client-latest \</span><br><span class="line">                  docker-common \</span><br><span class="line">                  docker-latest \</span><br><span class="line">                  docker-latest-logrotate \</span><br><span class="line">                  docker-logrotate \</span><br><span class="line">                  docker-engine</span><br></pre></td></tr></table></figure><h2 id="配置yum源并配置阿里云镜像"><a href="#配置yum源并配置阿里云镜像" class="headerlink" title="配置yum源并配置阿里云镜像"></a>配置yum源并配置阿里云镜像</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y yum-utils</span><br><span class="line">sudo yum-config-manager \</span><br><span class="line">--add-repo \</span><br><span class="line">http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></figure><p>如果很不幸，你和我一样出现了<span class="p red">Cannot find a valid baseurl for repo: base/7/x86_64</span>错误，请移步到<br><div class="tag link"><a class="link-card" title="解决方案" href="https://blog.ranni0000110.cn/2024/09/22/2024-9-22-%E5%85%B3%E4%BA%8E%E5%9C%A8Linux%E7%B3%BB%E7%BB%9F%E4%B8%AD%E9%83%A8%E7%BD%B2Redis/"><div class="left"><img src="https://ranni.s3.bitiful.net/1.jpg"></div><div class="right"><p class="text">解决方案</p><p class="url">https://blog.ranni0000110.cn/2024/09/22/2024-9-22-%E5%85%B3%E4%BA%8E%E5%9C%A8Linux%E7%B3%BB%E7%BB%9F%E4%B8%AD%E9%83%A8%E7%BD%B2Redis/</p></div></a></div>中查看我的解决方案</p><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</span><br></pre></td></tr></table></figure><h2 id="启动-amp-开机启动docker；-enable-start-二合一"><a href="#启动-amp-开机启动docker；-enable-start-二合一" class="headerlink" title="启动&amp; 开机启动docker； enable + start 二合一"></a>启动&amp; 开机启动docker； enable + start 二合一</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable docker --now</span><br></pre></td></tr></table></figure><h2 id="配置docker加速"><a href="#配置docker加速" class="headerlink" title="配置docker加速"></a>配置docker加速</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir -p /etc/docker</span><br><span class="line">sudo tee /etc/docker/daemon.json &lt;&lt;-&#x27;EOF&#x27;</span><br><span class="line">&#123;</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;https://mirror.ccs.tencentyun.com&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure><h1 id="Docker常用命令"><a href="#Docker常用命令" class="headerlink" title="Docker常用命令"></a>Docker常用命令</h1><h2 id="镜像相关"><a href="#镜像相关" class="headerlink" title="镜像相关"></a>镜像相关</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. docker images # 列出本地镜像</span><br><span class="line">2. docker pull [镜像名：版本] # 从镜像仓库下载镜像</span><br><span class="line">3. docker rmi [镜像名：版本] # 删除本地镜像</span><br><span class="line">若镜像不能正常删除，可以先运行</span><br><span class="line">docker ps -a</span><br><span class="line">查找哪个容器正在使用该镜像，然后删除该容器</span><br><span class="line">就可以删除镜像了</span><br><span class="line">4.docker commit -m &quot;提交信息&quot; -a &quot;作者&quot; [容器ID/容器名] [镜像名：版本号] # 提交容器为镜像 -m:提交信息 -a:作者</span><br><span class="line">5.docker save -o [文件名] [镜像名：版本号] # 保存镜像到文件 -o:将文件写为指定格式 例如.tar</span><br><span class="line">6.docker load -i [文件名] # 从文件加载镜像 -i:指定文件名</span><br></pre></td></tr></table></figure><h2 id="容器相关"><a href="#容器相关" class="headerlink" title="容器相关"></a>容器相关</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. docker run [镜像名] # 运行容器</span><br><span class="line">docker run -d --name (name) -p (外部端口):(内部端口) [镜像名：版本号] -d:后台启动 --name：给容器起名字 -p：端口映射</span><br><span class="line">2. docker ps # 列出运行中的容器</span><br><span class="line">3. docker ps -a # 列出所有容器</span><br><span class="line">4. docker stop [容器名] # 停止容器</span><br><span class="line">5. docker start [容器名] # 启动容器</span><br><span class="line">6. docker restart [容器名] # 重启容器</span><br><span class="line">7. docker rm [容器名] # 删除容器</span><br><span class="line">8. docker stats [容器名] # 容器状态</span><br><span class="line">9. docker exec [容器名] # 进入容器</span><br></pre></td></tr></table></figure>]]></content>
+        <content type="html"><![CDATA[<h1 id="CentOS-安装Docker"><a href="#CentOS-安装Docker" class="headerlink" title="CentOS 安装Docker"></a>CentOS 安装Docker</h1><h2 id="卸载旧版本"><a href="#卸载旧版本" class="headerlink" title="卸载旧版本"></a>卸载旧版本</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">yum remove docker \</span><br><span class="line">                docker-client \</span><br><span class="line">                docker-client-latest \</span><br><span class="line">                docker-common \</span><br><span class="line">                docker-latest \</span><br><span class="line">                docker-latest-logrotate \</span><br><span class="line">                docker-logrotate \</span><br><span class="line">                docker-engine</span><br></pre></td></tr></table></figure><h2 id="配置yum源并配置阿里云镜像"><a href="#配置yum源并配置阿里云镜像" class="headerlink" title="配置yum源并配置阿里云镜像"></a>配置yum源并配置阿里云镜像</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum install -y yum-utils</span><br><span class="line"></span><br><span class="line">yum-config-manager \</span><br><span class="line">--add-repo \</span><br><span class="line">http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></figure><p>如果很不幸，你和我一样出现了<span class="p red">Cannot find a valid baseurl for repo: base/7/x86_64</span>错误，请移步到<br><div class="tag link"><a class="link-card" title="解决方案" href="https://blog.ranni0000110.cn/2024/09/22/2024-9-22-%E5%85%B3%E4%BA%8E%E5%9C%A8Linux%E7%B3%BB%E7%BB%9F%E4%B8%AD%E9%83%A8%E7%BD%B2Redis/"><div class="left"><img src="https://ranni.s3.bitiful.net/1.jpg"></div><div class="right"><p class="text">解决方案</p><p class="url">https://blog.ranni0000110.cn/2024/09/22/2024-9-22-%E5%85%B3%E4%BA%8E%E5%9C%A8Linux%E7%B3%BB%E7%BB%9F%E4%B8%AD%E9%83%A8%E7%BD%B2Redis/</p></div></a></div>中查看我的解决方案</p><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</span><br></pre></td></tr></table></figure><h2 id="启动-amp-开机启动docker；-enable-start-二合一"><a href="#启动-amp-开机启动docker；-enable-start-二合一" class="headerlink" title="启动&amp; 开机启动docker； enable + start 二合一"></a>启动&amp; 开机启动docker； enable + start 二合一</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable docker --now</span><br></pre></td></tr></table></figure><h2 id="配置docker加速"><a href="#配置docker加速" class="headerlink" title="配置docker加速"></a>配置docker加速</h2><p>daemon.json里面的链接决定了你能否用docker pull镜像，这两个是我发现目前能用的，若不能用了就得自己找链接了，找到了记得发我一手😋<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/docker</span><br><span class="line"></span><br><span class="line">tee /etc/docker/daemon.json &lt;&lt;-&#x27;EOF&#x27; </span><br><span class="line">&#123;</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;https://docker.m.daocloud.io&quot;,</span><br><span class="line">        &quot;https://hub.iyuu.cn&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line"></span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure></p><h1 id="Docker常用命令"><a href="#Docker常用命令" class="headerlink" title="Docker常用命令"></a>Docker常用命令</h1><h2 id="镜像相关"><a href="#镜像相关" class="headerlink" title="镜像相关"></a>镜像相关</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. docker images # 列出本地镜像</span><br><span class="line">2. docker pull [镜像名：版本] # 从镜像仓库下载镜像</span><br><span class="line">3. docker rmi [镜像名：版本] # 删除本地镜像</span><br><span class="line">若镜像不能正常删除，可以先运行</span><br><span class="line">docker ps -a</span><br><span class="line">查找哪个容器正在使用该镜像，然后删除该容器</span><br><span class="line">就可以删除镜像了</span><br><span class="line">4.docker commit -m &quot;提交信息&quot; -a &quot;作者&quot; [容器ID/容器名] [镜像名：版本号] # 提交容器为镜像 -m:提交信息 -a:作者</span><br><span class="line">5.docker save -o [文件名] [镜像名：版本号] # 保存镜像到文件 -o:将文件写为指定格式 例如.tar</span><br><span class="line">6.docker load -i [文件名] # 从文件加载镜像 -i:指定文件名</span><br></pre></td></tr></table></figure><h2 id="容器相关"><a href="#容器相关" class="headerlink" title="容器相关"></a>容器相关</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. docker run [镜像名] # 运行容器</span><br><span class="line">docker run -d --name (name) -p (外部端口):(内部端口) [镜像名：版本号] -d:后台启动 --name：给容器起名字 -p：端口映射</span><br><span class="line">2. docker ps # 列出运行中的容器</span><br><span class="line">3. docker ps -a # 列出所有容器</span><br><span class="line">4. docker stop [容器名] # 停止容器</span><br><span class="line">5. docker start [容器名] # 启动容器</span><br><span class="line">6. docker restart [容器名] # 重启容器</span><br><span class="line">7. docker rm [容器名] # 删除容器</span><br><span class="line">8. docker stats [容器名] # 容器状态</span><br><span class="line">9. docker exec [容器名] # 进入容器</span><br></pre></td></tr></table></figure>]]></content>
       
       
       <categories>
@@ -102,31 +127,6 @@
             <tag> 部署 </tag>
             
             <tag> 常用命令 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于Redis的分布式缓存问题</title>
-      <link href="/2024/09/30/2024-9-30-%E5%85%B3%E4%BA%8ERedis%E7%9A%84%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98/"/>
-      <url>/2024/09/30/2024-9-30-%E5%85%B3%E4%BA%8ERedis%E7%9A%84%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98/</url>
-      
-        <content type="html"><![CDATA[<h1 id><a href="#" class="headerlink" title=" "></a> </h1>]]></content>
-      
-      
-      <categories>
-          
-          <category> 八股 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Redis </tag>
             
         </tags>
       
@@ -176,9 +176,9 @@
       
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 部署 </tag>
+            
+            <tag> Redis </tag>
             
             <tag> 踩坑及解决办法 </tag>
             
@@ -453,7 +453,7 @@
       <link href="/2024/07/15/2024-7-15-%E5%85%B3%E4%BA%8EHashMap%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/"/>
       <url>/2024/07/15/2024-7-15-%E5%85%B3%E4%BA%8EHashMap%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/</url>
       
-        <content type="html"><![CDATA[<h2 id="简述HashMap的基本原理"><a href="#简述HashMap的基本原理" class="headerlink" title="简述HashMap的基本原理"></a>简述HashMap的基本原理</h2><p>HashMap是基于哈希表实现的，由数组+链表\红黑树组成。在添加数据时先计算key的哈希值，若key的哈希值和某个值的哈希值相同，则比对key和值的区别，若相同则进行替换，若不同则存入链表或红黑树中。具体在下面的put方法实现中。<br>在JDK1.7版本中，HashMap仅采用数组加链表的形式进行存储，后来在JDK1.8中引入了红黑树，在链表长度&gt;8且数组长度&gt;64时，链表会自动转换为红黑树进行存储，若红黑树的大小小于6时会退化成链表。</p><h2 id="简述HashMap的put过程"><a href="#简述HashMap的put过程" class="headerlink" title="简述HashMap的put过程"></a>简述HashMap的put过程</h2><p>Hash在添加数据时首先会进行判断，判断数组是否为空，若为空则初始化一个长度为16的数组并进行添加。若不为空则根据key的哈希值进行索引，若哈希值为空则直接添加，并判断size+1是否大于临界值，若大于临界值则需要进行扩容。若key的哈希值不为空则有两种情况，一种是有两个一模一样的key插入进来，还有一种就是虽然哈希值相同但是key不相同，因为哈希值是有限的。这时候就要判断key是否相同。若相同则直接进行替换，以最后的key为主。若不相同则要把kv存入数组下的链表或红黑树中。这时候我们要先进行判断数组下面连着的是不是红黑树。如果是红黑树则要判断红黑树中的key是否相同，若相同则直接替换，若不同则红黑树添加。如果不是红黑树我们则要先遍历链表，检验key是否已经在链表中存在，若存在则进行覆盖，若不存在则在链表的末尾添加该kv。添加后我们还需要对链表的长度进行判断，若链表的长度大于8且数组的长度大于64，则链表需要转换为红黑树。</p><h2 id="简述HashMap的扩容过程"><a href="#简述HashMap的扩容过程" class="headerlink" title="简述HashMap的扩容过程"></a>简述HashMap的扩容过程</h2><p>首先我们要判断HashMap的旧容量（oldCap）是否大于0.若不大于0则证明此HashMap是刚刚创建的，需要对其进行初始化，我们设置容量为16的数组，设置扩容阈值为16*0.75=12，当容量大于12时会进行自动扩容。若旧容量大于0则证明已经初始化完成。那么我们就新建一个容量为原数组2倍的新数组，并将原数组的数据复制到新数组中。若数组中的next为空，则证明数组下面没有链表或红黑树，可以直接添加到新数组。若不为空我们就要判断下面的数据结构是否为红黑树。若是红黑树我们直接红黑树添加。若不是我们则先要遍历链表，并判断原标的哈希值和新表的哈希值是否相同。若相同则把该数组下面的所有值放置原位，若不相同则把需要移动的数组的所有值安置在原始位置+增加的数组大小的位置上。</p><h2 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h2><p>ConcurrentHashMap是HashMap的线程安全版本，所以在数据结构上和HashMap基本相同。在Java1.7版本中使用的是分段的数组+链表，在1.8版本中则跟HashMap1.8一样使用率数组+链表/红黑树。<br>1.7版本中ConcurrentHashMap采用了分段锁，底层使用的是ReentrantLock.在put的时候要先计算key的哈希值，定位到segment，如果是空就先初始化segment.若不为空则使用ReetrantLock加锁，如果获取锁失败就自旋获取，如果自旋超过一定次数就阻塞获取，保证能获取到锁。之后的流程和HashMap1.7版本相同。<br>1.8版本中ConcurrentHashMap采用了CAS+Synchronized来保证线程安全。相对于segment来说锁粒度更细，性能更好。</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="简述HashMap的基本原理"><a href="#简述HashMap的基本原理" class="headerlink" title="简述HashMap的基本原理"></a>简述HashMap的基本原理</h2><p>HashMap是基于哈希表实现的，由数组+链表\红黑树组成。在添加数据时先计算key的哈希值，若key的哈希值和某个值的哈希值相同，则比对key和值的区别，若相同则进行替换，若不同则存入链表或红黑树中。具体在下面的put方法实现中。<br>在JDK1.7版本中，HashMap仅采用数组加链表的形式进行存储，后来在JDK1.8中引入了红黑树，在链表长度&gt;8且数组长度&gt;64时，链表会自动转换为红黑树进行存储，若红黑树的大小小于6时会退化成链表。</p><h2 id="简述HashMap的put过程"><a href="#简述HashMap的put过程" class="headerlink" title="简述HashMap的put过程"></a>简述HashMap的put过程</h2><p>Hash在添加数据时首先会进行判断，判断数组是否为空，若为空则初始化一个长度为16的数组并进行添加。若不为空则根据key的哈希值进行索引，若哈希值为空则直接添加，并判断size+1是否大于临界值，若大于临界值则需要进行扩容。若key的哈希值不为空则有两种情况，一种是有两个一模一样的key插入进来，还有一种就是虽然哈希值相同但是key不相同，因为哈希值是有限的。这时候就要判断key是否相同。若相同则直接进行替换，以最后的key为主。若不相同则要把key存入数组下的链表或红黑树中。这时候我们要先进行判断数组下面连着的是不是红黑树。如果是红黑树则要判断红黑树中的key是否相同，若相同则直接替换，若不同则红黑树添加。如果不是红黑树我们则要先遍历链表，检验key是否已经在链表中存在，若存在则进行覆盖，若不存在则在链表的末尾添加该kv。添加后我们还需要对链表的长度进行判断，若链表的长度大于8且数组的长度大于64，则链表需要转换为红黑树。</p><h2 id="简述HashMap的扩容过程"><a href="#简述HashMap的扩容过程" class="headerlink" title="简述HashMap的扩容过程"></a>简述HashMap的扩容过程</h2><p>首先我们要判断HashMap的旧容量（oldCap）是否大于0.若不大于0则证明此HashMap是刚刚创建的，需要对其进行初始化，我们设置容量为16的数组，设置扩容阈值为16*0.75=12，当容量大于12时会进行自动扩容。若旧容量大于0则证明已经初始化完成。那么我们就新建一个容量为原数组2倍的新数组，并将原数组的数据复制到新数组中。若数组中的next为空，则证明数组下面没有链表或红黑树，可以直接添加到新数组。若不为空我们就要判断下面的数据结构是否为红黑树。若是红黑树我们直接红黑树添加。若不是我们则先要遍历链表，并判断原表的哈希值和新表的哈希值是否相同。若相同则把该数组下面的所有值放置原位，若不相同则把需要移动的数组的所有值安置在原始位置+增加的数组大小的位置上。</p><h2 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h2><p>ConcurrentHashMap是HashMap的线程安全版本，所以在数据结构上和HashMap基本相同。在Java1.7版本中使用的是分段的数组+链表，在1.8版本中则跟HashMap1.8一样使用率数组+链表/红黑树。<br>1.7版本中ConcurrentHashMap采用了分段锁，底层使用的是ReentrantLock.在put的时候要先计算key的哈希值，定位到segment，如果是空就先初始化segment.若不为空则使用ReetrantLock加锁，如果获取锁失败就自旋获取，如果自旋超过一定次数就阻塞获取，保证能获取到锁。之后的流程和HashMap1.7版本相同。<br>1.8版本中ConcurrentHashMap采用了CAS+Synchronized来保证线程安全。相对于segment来说锁粒度更细，性能更好。</p>]]></content>
       
       
       <categories>
@@ -534,7 +534,7 @@
       <link href="/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/"/>
       <url>/2024/07/05/2024-7-5-%E7%AE%80%E5%8D%95%E6%8F%8F%E8%BF%B0%E4%B8%80%E4%B8%8BJVM%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/</url>
       
-        <content type="html"><![CDATA[<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>首先，因为JVM只能运行二进制文件，为了能让JVM看懂文件都写了什么，我们要使用类加载器把.java文件编译成jvm能看懂的字节码文件并加载到JVM中。<br>类加载器主要由BootStrap（启动类加载器）、Extension（扩展类加载器）、AppClassLoader（应用类加载器）三个部分组成。<br>JVM在类需要加载的时候会直接委派给父类加载器也就是启动类加载器，如果加载不了再往下传，直到应用类加载器。这么做保证了两个好处。<br>一是通过双亲委派机制可以避免类被重复加载，确保唯一性和效率，二是保证类库的api不会被修改，确保安全性。</p><h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p>类从被加载到JVM到卸出内存一共分为七个阶段<br>首先是类的加载阶段，JVM通过类加载器加载类，把.class文件加载到内存中。<br>其次是连接阶段，JVM通过验证，准备，解析三个步骤来链接类，验证是为了确保类文件能够被JVM正确执行，准备是为类分配内存，一般是分配默认值，解析是把符号引用转换成直接引用。<br>然后是类的初始化阶段，一般这个阶段会把类赋予我们期望的值。但是如果我们新建的类是使用final修饰的基本类型，则赋值会直接在准备阶段完成。<br>最后是类的使用和销毁阶段，在使用类时我们会调用类的方法，当类不再被使用时，JVM会回收内存。</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>首先，因为JVM只能运行二进制文件，为了能让JVM看懂文件都写了什么，我们要使用类加载器把.java文件编译成jvm能看懂的字节码文件并加载到JVM中。<br>类加载器主要由BootStrap（启动类加载器）、Extension（扩展类加载器）、Application （应用类加载器）三个部分组成。<br>JVM在类需要加载的时候会直接委派给父类加载器也就是启动类加载器，如果加载不了再往下传，直到应用类加载器。这么做保证了两个好处。<br>一是通过双亲委派机制可以避免类被重复加载，确保唯一性和效率，二是保证类库的api不会被修改，确保安全性。</p><h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p>类从被加载到JVM到卸出内存一共分为七个阶段<br>首先是类的加载阶段，JVM通过类加载器加载类，把.class文件加载到内存中。<br>其次是连接阶段，JVM通过验证，准备，解析三个步骤来链接类，验证是为了确保类文件能够被JVM正确执行，准备是为类分配内存，一般是分配默认值，解析是把符号引用转换成直接引用。<br>然后是类的初始化阶段，一般这个阶段会把类赋予我们期望的值。但是如果我们新建的类是使用final修饰的基本类型，则赋值会直接在准备阶段完成。<br>最后是类的使用和销毁阶段，在使用类时我们会调用类的方法，当类不再被使用时，JVM会回收内存。</p>]]></content>
       
       
       <categories>
@@ -613,7 +613,7 @@
       <link href="/2024/06/28/2024-6-28-%E5%85%B3%E4%BA%8EMySQL%E4%B8%AD%E7%9A%84%E7%B4%A2%E5%BC%95/"/>
       <url>/2024/06/28/2024-6-28-%E5%85%B3%E4%BA%8EMySQL%E4%B8%AD%E7%9A%84%E7%B4%A2%E5%BC%95/</url>
       
-        <content type="html"><![CDATA[<h2 id="关于索引"><a href="#关于索引" class="headerlink" title="关于索引"></a>关于索引</h2><p>索引是帮助MySQL高效获取数据的数据结构，降低数据库的IO成本。索引有两种实现方式，分别是B+树和Hash索引。虽然Hash索引相对来说查询效率更快，但是Innodb的索引默认是用B+树实现的。因为B+树支持范围索引。用B+树不用B树的原因主要是B+树因为采用了非叶子节点只存储指针，叶子节点存储数据，且叶子节点直接用双向链表链接，这使得B+树的高度更低，一般只有三层，磁盘读写代价更低。</p><h3 id="聚集索引和非聚集索引"><a href="#聚集索引和非聚集索引" class="headerlink" title="聚集索引和非聚集索引"></a>聚集索引和非聚集索引</h3><p>聚集索引：数据和索引放在一起，B+树的叶子节点保存了整行数据，有且只有一个<br>非聚集索引：数据和索引分开存储，B+树的叶子节点保存了主键值，可以有多个</p><h3 id="回表查询"><a href="#回表查询" class="headerlink" title="回表查询"></a>回表查询</h3><p>通过非聚集索引找到对应的主键值，到聚集索引中查找整行数据。</p><h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>在使用索引查询时需要返回的列可以在该索引中直接找到，不需要进行回表查询。</p><h2 id="索引创建原则"><a href="#索引创建原则" class="headerlink" title="索引创建原则"></a>索引创建原则</h2><p>1.数据量大且查询频繁的表<br>2.使用where,order by,group by等字段的表<br>3.选择区分度高的列作为索引，使用唯一索引<br>4.字段过长时可以针对字段特点创建索引<br>5.尽量使用联合索引，覆盖索引<br>6.控制索引数量，不是越多越好<br>7.若索引列不能存储null,则创建表时使用not null约束</p><h2 id="索引失效"><a href="#索引失效" class="headerlink" title="索引失效"></a>索引失效</h2><p>1.违反最左原则<br>2.在join时左表或右表有一个没使用索引<br>3.在sql语句中进行隐性数据转换<br>4.在索引上做运算操作<br>5.在索引上引用函数（在MySQL8中新增了函数索引解决此问题）<br>6.like语句中%在开头</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="关于索引"><a href="#关于索引" class="headerlink" title="关于索引"></a>关于索引</h2><p>索引是帮助MySQL高效获取数据的数据结构，降低数据库的IO成本。索引有两种实现方式，分别是B+树和Hash索引。虽然Hash索引相对来说查询效率更快，但是Innodb的索引默认是用B+树实现的。因为B+树支持范围索引。用B+树不用B树的原因主要是B+树因为采用了非叶子节点只存储指针，叶子节点存储数据，且叶子节点直接用双向链表链接，这使得B+树的高度更低，一般只有三层，磁盘读写代价更低。</p><h3 id="聚集索引和非聚集索引"><a href="#聚集索引和非聚集索引" class="headerlink" title="聚集索引和非聚集索引"></a>聚集索引和非聚集索引</h3><p>聚集索引：数据和索引放在一起，B+树的叶子节点保存了整行数据，有且只有一个<br>非聚集索引：数据和索引分开存储，B+树的叶子节点保存了主键值，可以有多个</p><h3 id="回表查询"><a href="#回表查询" class="headerlink" title="回表查询"></a>回表查询</h3><p>通过非聚集索引找到对应的主键值，到聚集索引中查找整行数据。</p><h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>在使用索引查询时需要返回的列可以在该索引中直接找到，不需要进行回表查询。</p><h2 id="索引创建原则"><a href="#索引创建原则" class="headerlink" title="索引创建原则"></a>索引创建原则</h2><p>1.数据量大且查询频繁的表<br>2.使用where,order by,group by等字段的表<br>3.选择区分度高的列作为索引，使用唯一索引<br>4.字段过长时可以针对字段特点创建索引<br>5.尽量使用联合索引，覆盖索引<br>6.控制索引数量，不是越多越好<br>7.若索引列不能存储null,则创建表时使用not null约束</p><h2 id="索引失效"><a href="#索引失效" class="headerlink" title="索引失效"></a>索引失效</h2><p>1.违反最左原则<br>2.在join时左表或右表有一个没使用索引<br>3.在sql语句中进行隐性数据转换<br>4.在索引上做运算操作<br>5.在索引上引用函数（在MySQL8中新增了函数索引解决此问题）<br>6.like语句中%在开头</p><p>from  on  join  where  group by  having  order by  limit</p>]]></content>
       
       
       <categories>
@@ -650,9 +650,9 @@
       
         <tags>
             
-            <tag> Java </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> Java </tag>
             
         </tags>
       
@@ -727,9 +727,9 @@
       
         <tags>
             
-            <tag> Java </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> Java </tag>
             
         </tags>
       
@@ -754,9 +754,9 @@
       
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 常用命令 </tag>
+            
+            <tag> Redis </tag>
             
             <tag> Cpolar </tag>
             
